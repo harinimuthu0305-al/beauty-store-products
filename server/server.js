@@ -16,7 +16,6 @@ import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import liveProductsRouter from "./routes/liveProductsRoutes.js";
 
-
 // Load environment variables
 dotenv.config();
 
@@ -28,9 +27,14 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS — allow frontend to send FormData + token
+// ✅ CORS — allow localhost and Vercel frontend
 app.use(cors({
-  origin: "http://localhost:5175",
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "https://beauty-product-henna.vercel.app"
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -52,7 +56,6 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/live-products", liveProductsRouter);
-
 
 // Test Route
 app.get("/", (req, res) => {

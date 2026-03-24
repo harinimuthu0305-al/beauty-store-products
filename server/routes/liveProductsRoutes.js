@@ -1,5 +1,6 @@
 // backend/routes/live-products.js
 import express from "express";
+import Product from "../models/Product.js";
 const router = express.Router();
 
 // ✅ Complete product list with 11 categories, 5 products each
@@ -77,8 +78,28 @@ const products = [
 
 ];
 
-router.get("/", (req, res) => {
-  res.json(products);
+// ✅ GET /api/live-products — hardcoded + MongoDB products merged
+router.get("/", async (req, res) => {
+  try {
+    const mongoProducts = await Product.find({});
+    const formattedMongoProducts = mongoProducts.map((p) => ({
+      id: p._id,
+      name: p.name,
+      category: p.category,
+      brand: p.brand,
+      price: p.price,
+      image: p.image || "",
+      rating: p.rating || 4.0,
+      discount: p.discount || 0,
+      stock: p.stock || 0,
+      fromDB: true,
+    }));
+    const allProducts = [...products, ...formattedMongoProducts];
+    res.json(allProducts);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error fetching products" });
+  }
 });
 
 export default router;

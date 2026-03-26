@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://beauty-product.onrender.com/api",
+  baseURL: "http://localhost:4000/api", // ✅ Fixed
   withCredentials: true
 });
 

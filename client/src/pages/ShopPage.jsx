@@ -18,8 +18,6 @@ function ShopPage() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState("");
-
-  // ✅ NEW — Search & Filter states
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [minPrice, setMinPrice] = useState("");
@@ -29,6 +27,9 @@ function ShopPage() {
   const { addToCart } = useContext(CartContext);
   const { addToWishlist } = useContext(WishlistContext);
   const { user } = useContext(AuthContext);
+
+  // ✅ Helper to get product ID (handles both hardcoded id and MongoDB _id)
+  const getProductId = (product) => product._id || product.id;
 
   useEffect(() => {
     API.get("/live-products")
@@ -50,7 +51,6 @@ function ShopPage() {
     "Perfume","Eye Makeup","Face Makeup","Face Wash","Serum","Cream"
   ];
 
-  // ✅ NEW — Search + Category + Price + Rating filter
   const filteredProducts = products
     .filter((p) => selectedCategory === "All" ||
       p.category?.toLowerCase() === selectedCategory.toLowerCase())
@@ -73,7 +73,7 @@ function ShopPage() {
     setRating(5);
     setReviewError("");
     setReviewSuccess("");
-    fetchReviews(product.id);
+    fetchReviews(getProductId(product));
   };
 
   const closeModal = () => {
@@ -105,13 +105,13 @@ function ShopPage() {
       const token = user?.token;
       await API.post(
         "/reviews",
-        { productId: modalProduct.id, rating, comment },
+        { productId: getProductId(modalProduct), rating, comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setReviewSuccess("Review submitted!");
       setComment("");
       setRating(5);
-      fetchReviews(modalProduct.id);
+      fetchReviews(getProductId(modalProduct));
     } catch (err) {
       setReviewError(err.response?.data?.message || "Failed to submit review");
     } finally {
@@ -129,7 +129,6 @@ function ShopPage() {
       <span key={star} style={{ fontSize: size, color: star <= value ? "#ffaa00" : "#ddd" }}>★</span>
     ));
 
-  // ✅ Reset all filters
   const resetFilters = () => {
     setSearch("");
     setSortBy("default");
@@ -160,7 +159,6 @@ function ShopPage() {
           </div>
         ))}
 
-        {/* ✅ PRICE FILTER */}
         <hr style={{ margin: "12px 0" }} />
         <h6 style={{ fontWeight: "600", marginBottom: "8px" }}>Price Range (₹)</h6>
         <input
@@ -178,7 +176,6 @@ function ShopPage() {
           style={{ width: "100%", padding: "6px 8px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "13px", marginBottom: "6px", boxSizing: "border-box" }}
         />
 
-        {/* ✅ RATING FILTER */}
         <hr style={{ margin: "12px 0" }} />
         <h6 style={{ fontWeight: "600", marginBottom: "8px" }}>Min Rating</h6>
         {[0, 1, 2, 3, 4].map((r) => (
@@ -196,7 +193,6 @@ function ShopPage() {
           </div>
         ))}
 
-        {/* ✅ RESET */}
         <hr style={{ margin: "12px 0" }} />
         <button
           onClick={resetFilters}
@@ -209,7 +205,7 @@ function ShopPage() {
       {/* PRODUCTS */}
       <div style={{ flex: 1 }}>
 
-        {/* ✅ SEARCH + SORT BAR */}
+        {/* SEARCH + SORT BAR */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "16px", alignItems: "center" }}>
           <input
             type="text"
@@ -237,10 +233,11 @@ function ShopPage() {
           {search && ` for "${search}"`}
         </div>
 
+        {/* PRODUCT GRID */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "20px" }}>
           {filteredProducts.length > 0 ? (
             filteredProducts.map((p) => (
-              <div key={p.id} style={{ background: "#fff", borderRadius: "10px", overflow: "hidden", position: "relative", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+              <div key={getProductId(p)} style={{ background: "#fff", borderRadius: "10px", overflow: "hidden", position: "relative", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                 {p.discount > 0 && (
                   <span style={{ position: "absolute", top: "10px", left: "10px", background: "green", color: "#fff", padding: "3px 6px", fontSize: "12px", borderRadius: "4px" }}>
                     {p.discount}% OFF
@@ -280,7 +277,7 @@ function ShopPage() {
         </div>
       </div>
 
-      {/* MODAL — unchanged */}
+      {/* MODAL */}
       {modalProduct && (
         <div onClick={closeModal} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", padding: "20px", borderRadius: "12px", width: "420px", maxHeight: "90vh", overflowY: "auto", textAlign: "center", position: "relative" }}>

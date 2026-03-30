@@ -33,6 +33,7 @@ app.use(cors({
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175"
+    "https://beautystoreproducts-git-main-harinimuthu0305-als-projects.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],

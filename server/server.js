@@ -30,9 +30,6 @@ const app = express();
 // ✅ CORS — allow localhost only
 app.use(cors({
   origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
     "https://beautystoreproducts-git-main-harinimuthu0305-als-projects.vercel.app"
   ],
   credentials: true,

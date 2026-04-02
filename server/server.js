@@ -27,10 +27,14 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS — allow localhost only
+// ✅ CORS
 app.use(cors({
   origin: [
-    "https://beautystoreproducts-git-main-harinimuthu0305-als-projects.vercel.app"
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "https://beauty-store-products.vercel.app",
+    "https://beauty-store-products-iigbrpzxb-harinimuthu0305-als-projects.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
